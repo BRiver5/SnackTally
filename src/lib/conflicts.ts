@@ -3,12 +3,13 @@
 // предлагаем варианты — каждый проверен повторным решением плана, с итоговой
 // ценностью дня, а не обещанием на глаз.
 
+import { pluralWord } from "./words.ts";
 import { PIECES, solvePlan, type DayPlan, type Pin, type PlanInput } from "./planner.ts";
 
 export type Alternative = { kind: "fewer" | "flex" | "swap" | "check"; label: string; detail: string; plan: DayPlan; pin: Pin; flex: number; sdScale: number };
 export type PinConflict = { pin: Pin; need: number; cap: number; shortfall: number; margin: number; alternatives: Alternative[] };
 
-export type ConflictCtx = { bank: number; name: (id: string) => string; checks: (id: string) => number };
+export type ConflictCtx = { bank: number; name: (id: string) => string; unit: (id: string) => string; checks: (id: string) => number };
 
 export function resolvePin(inp: PlanInput, pin: Pin, ctx: ConflictCtx): PinConflict | null {
   const withPin = solvePlan({ ...inp, pins: [pin] });
@@ -25,7 +26,8 @@ export function resolvePin(inp: PlanInput, pin: Pin, ctx: ConflictCtx): PinConfl
     if (k >= pin.pieces) continue;
     const p = { ...pin, pieces: k };
     const plan = solvePlan({ ...inp, pins: [p] });
-    if (plan.feasible) alts.push({ kind: "fewer", label: `${k === 0.5 ? "Half" : k} ${k === 1 ? "piece" : k === 0.5 ? "a piece" : "pieces"} of ${name}`, detail: `Fits now and leaves room for the rest of the day.`, plan, pin: p, flex: 0, sdScale: 1 });
+    const u = ctx.unit(pin.snack);
+    if (plan.feasible) alts.push({ kind: "fewer", label: `${k === 0.5 ? `Half a ${u}` : k === 1 ? `One ${u}` : `${k} ${pluralWord(u)}`} of ${name}`, detail: `Fits now and leaves room for the rest of the day.`, plan, pin: p, flex: 0, sdScale: 1 });
   }
   if (ctx.bank > 0) {
     const use = Math.ceil(shortfall / 5) * 5 + 5;

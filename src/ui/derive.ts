@@ -67,19 +67,22 @@ export function useDay(): Day {
       const eaten = eatenOf(logs);
       const fc = forecast(st.minute, eaten, rates, ev, budget);
       const cap = o.cap ?? budget - fc.eatenMean - z * fc.eatenSd;
-      const plan = solvePlan({ minute: st.minute, cap, z, snacks: planSnacks, rates, pins: o.pins ?? [] });
+      const base = { minute: st.minute, cap, z, snacks: planSnacks, rates, pins: o.pins ?? [], busy: logs.map((l) => slotOf(l.minute)) };
+      let plan = solvePlan(base);
+      // Желание перестало влезать — план дня без него, как и на основном экране.
+      if (!plan.feasible) plan = solvePlan({ ...base, pins: [] });
       return { fc, plan };
     };
 
     const fc = forecast(st.minute, eatenOf(todayLogs), rates, ev, budget);
     const cap = budget - fc.eatenMean - z * fc.eatenSd;
-    const input: PlanInput = { minute: st.minute, cap, z, snacks: planSnacks, rates, pins: [] };
+    const input: PlanInput = { minute: st.minute, cap, z, snacks: planSnacks, rates, pins: [], busy: todayLogs.map((l) => slotOf(l.minute)) };
     const bank = st.settings.flex ? Math.max(0, flexBank(st.logs, st.today, st.settings.budget) - st.flexUsed) : 0;
     // Закреплённое желание, которое не влезает, план не ломает: план строится без него, а конфликт объясняет.
     let plan = solvePlan({ ...input, pins });
     let conflict: PinConflict | null = null;
     if (!plan.feasible && pins.length) {
-      conflict = resolvePin({ ...input, pins: [] }, pins[0], { bank, name, checks: (id) => info.get(id)?.portion.checks ?? 0 });
+      conflict = resolvePin({ ...input, pins: [] }, pins[0], { bank, name, unit: (id) => info.get(id)?.unit ?? "piece", checks: (id) => info.get(id)?.portion.checks ?? 0 });
       plan = solvePlan({ ...input, pins: pins.slice(1) });
       if (!plan.feasible) plan = solvePlan(input);
     }

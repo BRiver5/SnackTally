@@ -236,7 +236,7 @@ export function PlanWhySheet({ item, onClose }: { item: Option | null; onClose: 
       <View style={{ backgroundColor: t.colors.accentSoft, borderRadius: 16, padding: 12 }}>
         <Text style={{ ...t.typography.overline, color: t.colors.accent }}>Value</Text>
         <Row label="Worth it" value={`${tk.value.toFixed(1)} / 5`} note={tk.own !== null ? `Your ratings average ${tk.own.toFixed(1)}, pulled toward ${s.cat} (${tk.category.toFixed(1)}) until there are more.` : `No ratings yet — uses ${s.cat} snacks (${tk.category.toFixed(1)}).`} />
-        <Row label="More pieces" value={`× ${item.parts.dim.toFixed(2)}`} note="Each extra piece adds 60% of the one before — the first one counts most." />
+        <Row label="More pieces" value={`× ${item.parts.dim.toFixed(2)}`} note="Each extra piece adds 60% of the one before — the first one counts most. Only snacks rated above 3 earn a place." />
         <Row label="Craving window" value={`× ${item.parts.fit.toFixed(2)}`} note={`You usually snack ${(day.rates[item.slot]).toFixed(1)}× in ${slotLabel(item.slot)}; a snack where the craving is lands better.`} />
       </View>
       <View style={{ backgroundColor: t.colors.amberSoft, borderRadius: 16, padding: 12 }}>

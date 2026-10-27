@@ -1,43 +1,20 @@
 # Snack Tally
 
-**{{TAGLINE}}**
+Count snacks, not grams. A local-only snack counter: log a handful, a square or a
+cookie; the app learns what your portion really is, which snacks were worth it
+and when you usually snack — then plans the rest of the day so you stay within
+your snack budget.
 
-{{Один абзац о том, что делает приложение и для кого.}}
+- Chance to stay in budget, with a breakdown of where it comes from.
+- Exact rest-of-day plan; "I want…" explains why something doesn't fit and offers
+  checked alternatives (week flex, fewer pieces, a lighter snack).
+- What-if: compare the rest of the day before and after eating something now.
 
-## Особенности
+## Run
 
-- ...
-
-## Стек
-
-- Expo SDK 54 + expo-router, TypeScript
-- `expo-sqlite` — вся persistence локально на устройстве, интернет не нужен
-- `expo-notifications` / `expo-haptics` — если приложение их использует
-
-## Запуск
-
-```bash
+```
 npm install
 npx expo start
 ```
 
-`a` — Android, `i` — iOS, либо QR-код через Expo Go.
-
-## Структура проекта
-
-```
-app/            expo-router экраны
-src/
-  theme/        палитра, типографика, отступы, анимации
-  db/           expo-sqlite схема + миграции
-  data/         доступ к данным (замени items.example.ts)
-  services/     notifications, haptics
-  components/   переиспользуемые UI-примитивы
-  lib/          id, даты
-tools/          генератор иконок, проверки, rename-скрипт
-```
-
-## Данные
-
-Все данные хранятся локально на устройстве. Регистрации нет, интернет не
-требуется для работы приложения.
+`npm run verify` — typecheck, unit tests, project rules, offline export.

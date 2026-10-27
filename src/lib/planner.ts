@@ -16,7 +16,8 @@ const STEP = 5;
 export type PlanSnack = { id: string; cat: string; mean: number; sd: number; taste: number };
 export type Pin = { snack: string; slot: number; pieces: number };
 export type Option = { snack: string; slot: number; pieces: number; mean: number; cautious: number; value: number; parts: { taste: number; dim: number; fit: number } };
-export type PlanInput = { minute: number; cap: number; z: number; snacks: PlanSnack[]; rates: number[]; pins: Pin[] };
+// busy — окна, где сегодня уже был перекус: план ставит не больше одного перекуса на окно.
+export type PlanInput = { minute: number; cap: number; z: number; snacks: PlanSnack[]; rates: number[]; pins: Pin[]; busy?: number[] };
 export type DayPlan = { items: Option[]; value: number; used: number; cap: number; feasible: boolean; slots: number[] };
 
 export function dim(pieces: number): number {
@@ -36,7 +37,8 @@ export function option(sn: PlanSnack, slot: number, pieces: number, z: number, r
   const maxRate = Math.max(...rates, 1e-9);
   const fit = 0.55 + 0.45 * (rates[slot] / maxRate);
   const d = dim(pieces);
-  const t = Math.max(0, sn.taste - 1);
+  // 3 из 5 и ниже — «так себе»: такой перекус план не предлагает вовсе.
+  const t = Math.max(0, sn.taste - 3);
   return {
     snack: sn.id,
     slot,
@@ -49,7 +51,7 @@ export function option(sn: PlanSnack, slot: number, pieces: number, z: number, r
 }
 
 export function solvePlan(inp: PlanInput): DayPlan {
-  const slots = planSlots(inp.minute);
+  const slots = planSlots(inp.minute).filter((s) => !inp.busy?.includes(s) || inp.pins.some((p) => p.slot === s));
   const C = Math.max(0, Math.floor(inp.cap / STEP));
   const n = inp.snacks.length;
   const idx = new Map(inp.snacks.map((s, i) => [s.id, i]));

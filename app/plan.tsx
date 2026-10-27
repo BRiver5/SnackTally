@@ -20,7 +20,7 @@ import { phi } from "../src/lib/forecast";
 import { bestSlotFor, PIECES, type Option, type Pin } from "../src/lib/planner";
 import { comparePlans } from "../src/lib/conflicts";
 import { slotLabel } from "../src/lib/slots";
-import { pct } from "../src/ui/format";
+import { pct, plural } from "../src/ui/format";
 import { haptics } from "../src/services/haptics";
 
 type Tab = "plan" | "whatif";
@@ -185,7 +185,7 @@ export default function PlanScreen() {
           <View>
             {plan.slots.map((s, i) => {
               const o = byslot.get(s);
-              const pinned = day.input.pins.some((p) => p.slot === s);
+              const pinned = !!o && day.input.pins.some((p) => p.slot === s && p.snack === o.snack);
               const sn = o ? day.info.get(o.snack) : null;
               return (
                 <Animated.View key={s} entering={FadeInDown.delay(staggerDelay(i + 2, 50)).duration(350)} style={{ flexDirection: "row", gap: 12 }}>
@@ -255,7 +255,7 @@ export default function PlanScreen() {
                 </View>
                 {col("Chance to stay in", pct(cmp.before.pIn), pct(cmp.after.pIn), Math.abs(cmp.after.pIn - cmp.before.pIn) < 0.005 ? null : cmp.after.pIn > cmp.before.pIn)}
                 {col("Likely end of day", `${Math.round(cmp.before.mean)}`, `${Math.round(cmp.after.mean)}`, null)}
-                {col("Rest-of-day plan", `${cmp.before.planItems} snacks`, `${cmp.after.planItems} snacks`, cmp.after.planItems === cmp.before.planItems ? null : cmp.after.planItems > cmp.before.planItems)}
+                {col("Rest-of-day plan", plural(cmp.before.planItems, "snack"), plural(cmp.after.planItems, "snack"), cmp.after.planItems === cmp.before.planItems ? null : cmp.after.planItems > cmp.before.planItems)}
                 {col("Plan enjoyment", cmp.before.planValue.toFixed(1), cmp.after.planValue.toFixed(1), Math.abs(cmp.after.planValue - cmp.before.planValue) < 0.05 ? null : cmp.after.planValue > cmp.before.planValue)}
               </Animated.View>
               <Animated.View entering={FadeInDown.delay(staggerDelay(2)).duration(400)} style={{ backgroundColor: t.colors.surface, borderRadius: 22, padding: 16, gap: 6 }}>

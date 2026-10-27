@@ -80,10 +80,10 @@ test("DP plan equals brute force and never repeats a snack back to back", () => 
 
 test("pin that doesn't fit yields verified alternatives", () => {
   const inp = base(250, 15 * 60);
-  const c = resolvePin(inp, { snack: "nuts", slot: 10, pieces: 2 }, { bank: 300, name: (id) => id, checks: () => 0 });
+  const c = resolvePin(inp, { snack: "nuts", slot: 10, pieces: 2 }, { bank: 300, name: (id) => id, unit: () => "piece", checks: () => 0 });
   assert.ok(c && c.shortfall > 0);
   assert.ok(c!.alternatives.length >= 2);
   for (const a of c!.alternatives) assert.ok(a.plan.feasible && a.plan.items.some((o) => o.slot === 10));
   assert.ok(c!.alternatives.some((a) => a.kind === "flex"));
-  assert.equal(resolvePin(inp, { snack: "choc", slot: 10, pieces: 1 }, { bank: 0, name: (id) => id, checks: () => 0 }), null);
+  assert.equal(resolvePin(inp, { snack: "choc", slot: 10, pieces: 1 }, { bank: 0, name: (id) => id, unit: () => "piece", checks: () => 0 }), null);
 });
